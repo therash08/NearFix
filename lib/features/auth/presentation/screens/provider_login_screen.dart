@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/auth/auth_provider.dart';
 
 class ProviderLoginScreen extends ConsumerStatefulWidget {
   const ProviderLoginScreen({Key? key}) : super(key: key);
@@ -14,43 +13,69 @@ class ProviderLoginScreen extends ConsumerStatefulWidget {
 }
 
 class _ProviderLoginScreenState extends ConsumerState<ProviderLoginScreen> {
-  final _emailCtrl = TextEditingController();
-  final _passCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
   bool _loading = false;
 
   @override
   void dispose() {
-    _emailCtrl.dispose();
-    _passCtrl.dispose();
+    _phoneCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _signIn() async {
-    final email = _emailCtrl.text.trim();
-    final pass = _passCtrl.text;
-    if (email.isEmpty || pass.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Enter email and password')));
+  void _continue() {
+    final phone = _phoneCtrl.text.trim();
+    if (phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter phone number')),
+      );
       return;
     }
-    setState(() => _loading = true);
-    try {
-      await ref.read(authServiceProvider).signIn(email, pass);
-      context.go('/provider-dashboard');
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Phone Authentication Ready'),
+        content: const Text(
+          'Phone authentication is ready, but backend is not configured in this demo.\n\nUse Demo Login to continue into the Provider dashboard.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(c).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(c).pop();
+              context.go('/provider-dashboard');
+            },
+            child: const Text('Demo Login'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _googleSignIn() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Google Sign-In (mock for provider)')),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        backgroundColor: AppTheme.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/role-selection'),
+        ),
+        title: const Text(
+          'Provider Login',
+          style: TextStyle(color: AppTheme.textPrimary),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -58,37 +83,66 @@ class _ProviderLoginScreenState extends ConsumerState<ProviderLoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const SizedBox(height: 8),
+                const Icon(
+                  Icons.handyman,
+                  size: 80,
+                  color: AppTheme.primaryPurple,
+                ),
+                const SizedBox(height: 18),
                 const Text(
                   'Provider Portal',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Login to manage your services',
+                  'Join and manage your bookings',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: AppTheme.textSecondary),
+                  style: TextStyle(color: AppTheme.textSecondary),
                 ),
                 const SizedBox(height: 24),
                 TextField(
-                  controller: _emailCtrl,
-                  decoration: const InputDecoration(hintText: 'Email'),
+                  controller: _phoneCtrl,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    prefixText: '+91 ',
+                    hintText: 'Phone number',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _loading ? null : _continue,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                    backgroundColor: AppTheme.primaryPurple,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Text('Continue'),
                 ),
                 const SizedBox(height: 12),
-                TextField(
-                  controller: _passCtrl,
-                  obscureText: true,
-                  decoration: const InputDecoration(hintText: 'Password'),
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryPurple,
+                OutlinedButton.icon(
+                  onPressed: _googleSignIn,
+                  icon: const Icon(
+                    Icons.g_mobiledata,
+                    color: AppTheme.textPrimary,
                   ),
-                  onPressed: _loading ? null : _signIn,
-                  child: _loading
-                      ? const CircularProgressIndicator()
-                      : const Text('Login as Provider'),
+                  label: const Text('Continue with Google'),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextButton(

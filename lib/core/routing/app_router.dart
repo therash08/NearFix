@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/screens/role_selection_screen.dart';
+import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/user_login_screen.dart';
 import '../../features/auth/presentation/screens/provider_login_screen.dart';
 import '../../features/auth/presentation/screens/admin_login_screen.dart';
@@ -16,10 +17,11 @@ import '../../features/user_app/presentation/screens/search_service_screen.dart'
 // service detail and booking confirm are opened via Navigator.push
 
 final appRouter = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/splash',
   routes: [
+    GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(
-      path: '/',
+      path: '/role-selection',
       builder: (context, state) => const RoleSelectionScreen(),
     ),
     GoRoute(

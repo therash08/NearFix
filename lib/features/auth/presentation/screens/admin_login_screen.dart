@@ -109,7 +109,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextButton(
-                  onPressed: () => context.go('/'),
+                  onPressed: () => context.go('/role-selection'),
                   child: const Text(
                     'Return to App',
                     style: TextStyle(color: Colors.white54),

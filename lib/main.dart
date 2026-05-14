@@ -4,11 +4,7 @@ import 'core/theme/app_theme.dart';
 import 'core/routing/app_router.dart';
 
 void main() {
-  runApp(
-    const ProviderScope(
-      child: NearFixApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: NearFixApp()));
 }
 
 class NearFixApp extends ConsumerWidget {

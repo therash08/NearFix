@@ -158,18 +158,86 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildCategoryGrid() {
     final categories = [
-      {'icon': LucideIcons.wind, 'name': 'AC Repair', 'color': Colors.blue},
+      {
+        'icon': LucideIcons.wind,
+        'name': 'AC Repair Services',
+        'colors': [Color(0xFFBDE7FF), Color(0xFFCDE8FF)],
+      },
       {
         'icon': LucideIcons.monitor,
-        'name': 'Appliance',
-        'color': Colors.orange,
+        'name': 'Appliance Repair',
+        'colors': [Color(0xFFFFE7D1), Color(0xFFFFF0E6)],
       },
-      {'icon': LucideIcons.sprayCan, 'name': 'Cleaning', 'color': Colors.cyan},
-      {'icon': LucideIcons.scissors, 'name': 'Salon', 'color': Colors.purple},
-      {'icon': LucideIcons.truck, 'name': 'Shifting', 'color': Colors.indigo},
-      {'icon': LucideIcons.wrench, 'name': 'Plumbing', 'color': Colors.teal},
-      {'icon': LucideIcons.car, 'name': 'Car Care', 'color': Colors.red},
-      {'icon': LucideIcons.bug, 'name': 'Pest Control', 'color': Colors.green},
+      {
+        'icon': LucideIcons.sprayCan,
+        'name': 'Cleaning Solution',
+        'colors': [Color(0xFFD9FCFF), Color(0xFFE8F8FF)],
+      },
+      {
+        'icon': LucideIcons.scissors,
+        'name': 'Beauty & Wellness',
+        'colors': [Color(0xFFF3E8FF), Color(0xFFE5F0FF)],
+      },
+      {
+        'icon': LucideIcons.truck,
+        'name': 'Shifting Services',
+        'colors': [Color(0xFFDDEBFF), Color(0xFFEFF6FF)],
+      },
+      {
+        'icon': LucideIcons.shoppingBag,
+        'name': 'Sheba Shop',
+        'colors': [Color(0xFFDFFCF3), Color(0xFFEFFDF8)],
+      },
+      {
+        'icon': LucideIcons.scissors,
+        'name': 'Men’s Care & Salon',
+        'colors': [Color(0xFFFCE8FF), Color(0xFFF7F0FF)],
+      },
+      {
+        'icon': LucideIcons.heart,
+        'name': 'Health & Care',
+        'colors': [Color(0xFFFFF0F3), Color(0xFFFFF8FA)],
+      },
+      {
+        'icon': LucideIcons.monitor,
+        'name': 'Electronics & Gadgets',
+        'colors': [Color(0xFFE6F2FF), Color(0xFFEFF9FF)],
+      },
+      {
+        'icon': LucideIcons.zap,
+        'name': 'Electric & Plumbing',
+        'colors': [Color(0xFFFFF7EA), Color(0xFFFFFDF2)],
+      },
+      {
+        'icon': LucideIcons.bug,
+        'name': 'Pest Control',
+        'colors': [Color(0xFFEFFFE8), Color(0xFFF7FFF0)],
+      },
+      {
+        'icon': LucideIcons.user,
+        'name': 'Driver Service',
+        'colors': [Color(0xFFEFF6FF), Color(0xFFF6FBFF)],
+      },
+      {
+        'icon': LucideIcons.car,
+        'name': 'Car Care Services',
+        'colors': [Color(0xFFFFEFEF), Color(0xFFFFF6F6)],
+      },
+      {
+        'icon': LucideIcons.mapPin,
+        'name': 'Trips & Travels',
+        'colors': [Color(0xFFEFF7FF), Color(0xFFF7FBFF)],
+      },
+      {
+        'icon': LucideIcons.car,
+        'name': 'Car Rental',
+        'colors': [Color(0xFFE6FFF6), Color(0xFFF2FFF9)],
+      },
+      {
+        'icon': Icons.format_paint,
+        'name': 'Painting & Renovation',
+        'colors': [Color(0xFFFFEFFF), Color(0xFFFFF5FF)],
+      },
     ];
 
     return Column(
@@ -192,44 +260,76 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 4,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.8,
-          ),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final cat = categories[index];
-            return Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: (cat['color'] as Color).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final crossAxis = width > 600 ? 6 : 4;
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxis,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.85,
+              ),
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final cat = categories[index];
+                final colors =
+                    (cat['colors'] as List<Color>?) ??
+                    [AppTheme.primaryBlue, AppTheme.primaryCyan];
+                return InkWell(
+                  onTap: () {},
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: colors,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primaryBlue.withOpacity(0.06),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.18),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            cat['icon'] as IconData,
+                            size: 28,
+                            color: AppTheme.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          cat['name'] as String,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Icon(
-                    cat['icon'] as IconData,
-                    color: cat['color'] as Color,
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  cat['name'] as String,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                );
+              },
             );
           },
         ),

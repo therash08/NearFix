@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/auth/auth_provider.dart';
-import '../../../../core/auth/auth_model.dart';
 
 class UserLoginScreen extends ConsumerStatefulWidget {
   const UserLoginScreen({Key? key}) : super(key: key);
@@ -14,95 +12,184 @@ class UserLoginScreen extends ConsumerStatefulWidget {
 }
 
 class _UserLoginScreenState extends ConsumerState<UserLoginScreen> {
-  final _emailCtrl = TextEditingController();
-  final _passCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
   bool _loading = false;
 
   @override
   void dispose() {
-    _emailCtrl.dispose();
-    _passCtrl.dispose();
+    _phoneCtrl.dispose();
     super.dispose();
   }
 
-  Future<void> _signIn() async {
-    final email = _emailCtrl.text.trim();
-    final pass = _passCtrl.text;
-    if (email.isEmpty || pass.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Enter email and password')));
+  void _continue() {
+    final phone = _phoneCtrl.text.trim();
+    if (phone.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter phone number')),
+      );
       return;
     }
-    setState(() => _loading = true);
-    try {
-      await ref.read(authServiceProvider).signIn(email, pass);
-      final user = ref.read(authServiceProvider).currentUser;
-      if (user != null && user.role == UserRole.provider) {
-        context.go('/provider-dashboard');
-      } else if (user != null && user.role == UserRole.admin) {
-        context.go('/admin-dashboard');
-      } else {
-        context.go('/home');
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
+    // OTP backend is not connected — present demo login option
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Phone Authentication Ready'),
+        content: const Text(
+          'Phone authentication is ready, but backend is not configured in this demo.\n\nUse Demo Login to continue into the app.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(c).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(c).pop();
+              // Navigate to main user home in demo mode
+              context.go('/home');
+            },
+            child: const Text('Demo Login'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _googleSignIn() {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Google Sign-In (mock)')));
+  }
+
+  void _forgotPassword() {
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Forgot password'),
+        content: const Text(
+          'A password reset link will be sent to your email (mock).',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(c).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        backgroundColor: AppTheme.background,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/role-selection'),
+        ),
+        title: const Text(
+          'Sign in',
+          style: TextStyle(color: AppTheme.textPrimary),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(32.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.person, size: 80, color: AppTheme.primaryCyan),
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
+                const Icon(
+                  Icons.person_outline,
+                  size: 80,
+                  color: AppTheme.primaryBlue,
+                ),
+                const SizedBox(height: 18),
                 const Text(
-                  'Welcome Back!',
+                  'Phone number login',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Phone authentication is ready. Use Demo Login to continue.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppTheme.textSecondary),
+                ),
+                const SizedBox(height: 24),
+                TextField(
+                  controller: _phoneCtrl,
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    prefixText: '+91 ',
+                    hintText: 'Phone number',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                TextField(
-                  controller: _emailCtrl,
-                  decoration: const InputDecoration(hintText: 'Email'),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _passCtrl,
-                  obscureText: true,
-                  decoration: const InputDecoration(hintText: 'Password'),
-                ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: _loading ? null : _signIn,
+                  onPressed: _loading ? null : _continue,
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(52),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
                   child: _loading
                       ? const SizedBox(
-                          width: 16,
-                          height: 16,
+                          width: 18,
+                          height: 18,
                           child: CircularProgressIndicator(),
                         )
-                      : const Text('Sign in'),
+                      : const Text('Continue'),
                 ),
                 const SizedBox(height: 12),
+                Row(
+                  children: const [
+                    Expanded(child: Divider()),
+                    SizedBox(width: 12),
+                    Text(
+                      'Or continue with',
+                      style: TextStyle(color: AppTheme.textSecondary),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(child: Divider()),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _googleSignIn,
+                  icon: const Icon(
+                    Icons.g_mobiledata,
+                    color: AppTheme.textPrimary,
+                  ),
+                  label: const Text('Continue with Google'),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: _forgotPassword,
+                  child: const Text('Forgot password?'),
+                ),
+                const SizedBox(height: 8),
                 TextButton(
                   onPressed: () => context.go('/signup-user'),
-                  child: const Text('Don\'t have an account? Sign up'),
+                  child: const Text('Don\'t have an account? Create one'),
                 ),
               ],
             ),

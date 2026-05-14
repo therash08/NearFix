@@ -66,7 +66,7 @@ class _BookingConfirmScreenState extends ConsumerState<BookingConfirmScreen> {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Booking created')));
-        context.go('/');
+        context.go('/home');
       }
     } catch (e) {
       if (mounted)

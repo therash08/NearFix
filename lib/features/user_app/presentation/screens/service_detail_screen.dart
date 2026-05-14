@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../provider_app/domain/models/service_model.dart';
 import '../../../provider_app/data/provider_service.dart';
-import '../../../../core/auth/auth_provider.dart';
+// auth provider unused here
 import 'booking_confirm_screen.dart';
 
 class ServiceDetailScreen extends ConsumerStatefulWidget {
